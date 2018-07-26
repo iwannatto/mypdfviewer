@@ -1,0 +1,19 @@
+<p id="notice"><%= notice %></p>
+
+<p>
+  <strong>Name:</strong>
+  <%= @pdf.name %>
+</p>
+
+<p>
+  <strong>Last access:</strong>
+  <%= @pdf.last_access %>
+</p>
+
+<p>
+  <strong>Pdf:</strong>
+  <%= link_to url_for(@pdf.pdf), url_for(@pdf.pdf) %>
+</p>
+
+<%= link_to 'Edit', edit_pdf_path(@pdf) %> |
+<%= link_to 'Back', pdfs_path %>
