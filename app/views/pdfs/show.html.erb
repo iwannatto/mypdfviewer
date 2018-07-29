@@ -15,5 +15,10 @@
   <%= link_to url_for(@pdf.pdf), url_for(@pdf.pdf) %>
 </p>
 
+<p>
+  <strong>Jpg:</strong>
+  <%= link_to url_for(@pdf.jpeg), url_for(@pdf.jpeg) %>
+</p>
+
 <%= link_to 'Edit', edit_pdf_path(@pdf) %> |
 <%= link_to 'Back', pdfs_path %>

@@ -10,6 +10,13 @@ class PdfsController < ApplicationController
   # GET /pdfs/1
   # GET /pdfs/1.json
   def show
+    require 'mini_magick'
+    binary = @pdf.pdf.download
+    pdf = MiniMagick::Image.read(binary)
+    jpeg = pdf.format('jpeg', 0)
+    require 'stringio'
+    sio_jpeg = StringIO.new(jpeg.to_blob)
+    @pdf.jpeg.attach(io: sio_jpeg, filename: '0.jpeg', content_type: 'image/jpeg')
   end
 
   # GET /pdfs/new
