@@ -13,10 +13,15 @@ class PdfsController < ApplicationController
     require 'mini_magick'
     binary = @pdf.pdf.download
     pdf = MiniMagick::Image.read(binary)
-    jpeg = pdf.format('jpeg', 0)
-    require 'stringio'
-    sio_jpeg = StringIO.new(jpeg.to_blob)
-    @pdf.jpeg.attach(io: sio_jpeg, filename: '0.jpeg', content_type: 'image/jpeg')
+    require 'tempfile'
+    Tempfile.create(["", ".jpeg"]) do |jpeg|
+      MiniMagick::Tool::Convert.new do |convert|
+        convert.density(600)
+        convert << pdf.path
+        convert << jpeg.path
+      end
+      @pdf.jpeg.attach(io: jpeg, filename: '0.jpeg', content_type: 'image/jpeg')
+    end
   end
 
   # GET /pdfs/new
