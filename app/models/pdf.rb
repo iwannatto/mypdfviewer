@@ -4,5 +4,5 @@ class Pdf < ApplicationRecord
   validates :pdf,
     pdf: true
     
-  has_one_attached :jpeg
+  has_many_attached :jpegs
 end

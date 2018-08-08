@@ -16,8 +16,10 @@
 </p>
 
 <p>
-  <strong>Jpg:</strong>
-  <%= link_to url_for(@pdf.jpeg), url_for(@pdf.jpeg) %>
+  <strong>Jpegs:</strong>
+  <% @pdf.jpegs.attachments.each do |jpeg| %>
+    <%= link_to url_for(jpeg), url_for(jpeg) %>
+  <% end %>
 </p>
 
 <%= link_to 'Edit', edit_pdf_path(@pdf) %> |

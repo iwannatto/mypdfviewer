@@ -1,3 +1,6 @@
+require 'mini_magick'
+require 'tempfile'
+
 class PdfsController < ApplicationController
   before_action :set_pdf, only: [:show, :edit, :update, :destroy]
   
@@ -10,17 +13,20 @@ class PdfsController < ApplicationController
   # GET /pdfs/1
   # GET /pdfs/1.json
   def show
-    require 'mini_magick'
+    @pdf.jpegs.purge
     binary = @pdf.pdf.download
     pdf = MiniMagick::Image.read(binary)
-    require 'tempfile'
-    Tempfile.create(["", ".jpeg"]) do |jpeg|
-      MiniMagick::Tool::Convert.new do |convert|
-        convert.density(600)
-        convert << pdf.path
-        convert << jpeg.path
+    pdf.layers.each_with_index do |page, idx|
+      Tempfile.create(["", ".jpeg"]) do |jpeg|
+        MiniMagick::Tool::Convert.new do |convert|
+          convert.density(450)
+          convert << page.path
+          convert << jpeg.path
+        end
+        puts idx
+        @pdf.jpegs.attach(io: jpeg,
+          filename: "#{idx}.jpeg", content_type: 'image/jpeg')
       end
-      @pdf.jpeg.attach(io: jpeg, filename: '0.jpeg', content_type: 'image/jpeg')
     end
   end
 
