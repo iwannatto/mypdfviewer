@@ -18,7 +18,7 @@
 <p>
   <strong>Jpegs:</strong>
   <% @pdf.jpegs.attachments.each do |jpeg| %>
-    <%= link_to url_for(jpeg), url_for(jpeg) %>
+    <%= image_tag url_for(jpeg), width: 600 %>
   <% end %>
 </p>
 

@@ -13,21 +13,8 @@ class PdfsController < ApplicationController
   # GET /pdfs/1
   # GET /pdfs/1.json
   def show
-    @pdf.jpegs.purge
-    binary = @pdf.pdf.download
-    pdf = MiniMagick::Image.read(binary)
-    pdf.layers.each_with_index do |page, idx|
-      Tempfile.create(["", ".jpeg"]) do |jpeg|
-        MiniMagick::Tool::Convert.new do |convert|
-          convert.density(450)
-          convert << page.path
-          convert << jpeg.path
-        end
-        puts idx
-        @pdf.jpegs.attach(io: jpeg,
-          filename: "#{idx}.jpeg", content_type: 'image/jpeg')
-      end
-    end
+    @pdf.last_access = Time.zone.now
+    @pdf.save
   end
 
   # GET /pdfs/new
@@ -43,9 +30,11 @@ class PdfsController < ApplicationController
   # POST /pdfs.json
   def create
     @pdf = Pdf.new(pdf_params)
-
+    @pdf.last_access = Time.zone.now
+    
     respond_to do |format|
       if @pdf.save
+        pdf_to_jpegs
         format.html { redirect_to @pdf, notice: 'Pdf was successfully created.' }
         format.json { render :show, status: :created, location: @pdf }
       else
@@ -60,6 +49,7 @@ class PdfsController < ApplicationController
   def update
     respond_to do |format|
       if @pdf.update(pdf_params)
+        pdf_to_jpegs
         format.html { redirect_to @pdf, notice: 'Pdf was successfully updated.' }
         format.json { render :show, status: :ok, location: @pdf }
       else
@@ -87,6 +77,23 @@ class PdfsController < ApplicationController
 
     # Never trust parameters from the scary internet, only allow the white list through.
     def pdf_params
-      params.require(:pdf).permit(:name, :last_access, :pdf)
+      params.require(:pdf).permit(:name, :pdf)
+    end
+    
+    def pdf_to_jpegs
+      @pdf.jpegs.purge
+      binary = @pdf.pdf.download
+      pdf = MiniMagick::Image.read(binary)
+      pdf.layers.each_with_index do |page, idx|
+        Tempfile.create(["", ".jpeg"]) do |jpeg|
+          MiniMagick::Tool::Convert.new do |convert|
+            convert.density(300)
+            convert << page.path
+            convert << jpeg.path
+          end
+          @pdf.jpegs.attach(io: jpeg,
+            filename: "#{idx}.jpeg", content_type: 'image/jpeg')
+        end
+      end
     end
 end
