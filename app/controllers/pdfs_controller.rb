@@ -7,7 +7,7 @@ class PdfsController < ApplicationController
   # GET /pdfs
   # GET /pdfs.json
   def index
-    @pdfs = Pdf.all
+    @pdfs = Pdf.all.order(last_access: :desc)
   end
 
   # GET /pdfs/1
@@ -29,12 +29,21 @@ class PdfsController < ApplicationController
   # POST /pdfs
   # POST /pdfs.json
   def create
+    if pdf_params[:pdf].nil?
+      # errorを出すべき
+      respond_to do |format|
+        format.html { render plain: 'file needed' }
+        format.json { render json: @pdf.errors, status: :unprocessable_entity }
+      end
+      return
+    end
     @pdf = Pdf.new(pdf_params)
+    @pdf.name = pdf_params[:pdf].original_filename if pdf_params[:name].nil?
     @pdf.last_access = Time.zone.now
+    pdf_to_jpegs
     
     respond_to do |format|
       if @pdf.save
-        pdf_to_jpegs
         format.html { redirect_to @pdf, notice: 'Pdf was successfully created.' }
         format.json { render :show, status: :created, location: @pdf }
       else
@@ -47,9 +56,9 @@ class PdfsController < ApplicationController
   # PATCH/PUT /pdfs/1
   # PATCH/PUT /pdfs/1.json
   def update
+    pdf_to_jpegs if pdf_params[:pdf]
     respond_to do |format|
       if @pdf.update(pdf_params)
-        pdf_to_jpegs
         format.html { redirect_to @pdf, notice: 'Pdf was successfully updated.' }
         format.json { render :show, status: :ok, location: @pdf }
       else
@@ -82,8 +91,7 @@ class PdfsController < ApplicationController
     
     def pdf_to_jpegs
       @pdf.jpegs.purge
-      binary = @pdf.pdf.download
-      pdf = MiniMagick::Image.read(binary)
+      pdf = MiniMagick::Image.open(pdf_params.tempfile.path)
       pdf.layers.each_with_index do |page, idx|
         Tempfile.create(["", ".jpeg"]) do |jpeg|
           MiniMagick::Tool::Convert.new do |convert|
