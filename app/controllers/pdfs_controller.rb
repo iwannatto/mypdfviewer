@@ -13,7 +13,7 @@ class PdfsController < ApplicationController
   # GET /pdfs/1
   # GET /pdfs/1.json
   def show
-    @pdf.last_access = Time.zone.now
+    @pdf.last_access = Time.now
     @pdf.save
   end
 
