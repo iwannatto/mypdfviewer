@@ -91,7 +91,7 @@ class PdfsController < ApplicationController
     
     def pdf_to_jpegs
       @pdf.jpegs.purge
-      pdf = MiniMagick::Image.open(pdf_params.tempfile.path)
+      pdf = MiniMagick::Image.open(pdf_params[:pdf].path)
       pdf.layers.each_with_index do |page, idx|
         Tempfile.create(["", ".jpeg"]) do |jpeg|
           MiniMagick::Tool::Convert.new do |convert|
