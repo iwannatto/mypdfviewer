@@ -29,35 +29,25 @@ class PdfsController < ApplicationController
   # POST /pdfs
   # POST /pdfs.json
   def create
-    if pdf_params[:pdf].nil?
-      # errorを出すべき
+    @pdf = Pdf.new
+    # active storageはnewした段階で保存されてしまい、
+    # モデルバリデーションは後からになってしまうので、ここで検証する。
+    if !create_pdf_validation
       respond_to do |format|
-        format.html { render plain: 'file needed' }
-        format.json { render json: @pdf.errors, status: :unprocessable_entity }
-      end
-      return
-    end
-    if pdf_params[:pdf].size > 1.gigabytes
-      # error
-      respond_to do |format|
-        format.html { render plain: 'filesize must be less than 1GB' }
-        format.json { render json: @pdf.errors, status: unprocessable_entity }
-      end
-      return
-    end
-    @pdf = Pdf.new(pdf_params)
-    @pdf.name = pdf_params[:pdf].original_filename if pdf_params[:name] = ""
-    @pdf.last_access = Time.zone.now
-    pdf_to_jpegs
-    
-    respond_to do |format|
-      if @pdf.save
-        format.html { redirect_to @pdf, notice: 'Pdf was successfully created.' }
-        format.json { render :show, status: :created, location: @pdf }
-      else
         format.html { render :new }
         format.json { render json: @pdf.errors, status: :unprocessable_entity }
       end
+      return
+    end
+    
+    @pdf.attributes = pdf_params
+    @pdf.name = pdf_params[:pdf].original_filename if pdf_params[:name] = ""
+    @pdf.last_access = Time.zone.now
+    pdf_to_jpegs
+    @pdf.save
+    respond_to do |format|
+      format.html { redirect_to @pdf, notice: 'Pdf was successfully created.' }
+      format.json { render :show, status: :created, location: @pdf }
     end
   end
 
@@ -95,6 +85,20 @@ class PdfsController < ApplicationController
     # Never trust parameters from the scary internet, only allow the white list through.
     def pdf_params
       params.require(:pdf).permit(:name, :pdf)
+    end
+    
+    def create_pdf_validation
+      pdf = pdf_params[:pdf]
+      if pdf.nil?
+        @pdf.errors.add(:pdf, ' : file is required')
+      elsif !pdf.original_filename.include?('.pdf')
+        @pdf.errors.add(:pdf, ' : file should be pdf')
+      elsif pdf.size > 1.gigabytes
+        @pdf.errors.add(:pdf, ' : file should be less than 1GB')
+      else
+        return true
+      end
+      return false
     end
     
     def pdf_to_jpegs
