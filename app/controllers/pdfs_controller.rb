@@ -37,8 +37,16 @@ class PdfsController < ApplicationController
       end
       return
     end
+    if pdf_params[:pdf].size > 1.gigabytes
+      # error
+      respond_to do |format|
+        format.html { render plain: 'filesize must be less than 1GB' }
+        format.json { render json: @pdf.errors, status: unprocessable_entity }
+      end
+      return
+    end
     @pdf = Pdf.new(pdf_params)
-    @pdf.name = pdf_params[:pdf].original_filename if pdf_params[:name].nil?
+    @pdf.name = pdf_params[:pdf].original_filename if pdf_params[:name] = ""
     @pdf.last_access = Time.zone.now
     pdf_to_jpegs
     
