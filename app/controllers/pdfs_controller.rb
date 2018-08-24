@@ -107,7 +107,7 @@ class PdfsController < ApplicationController
       pdf.layers.each_with_index do |page, idx|
         Tempfile.create(["", ".jpeg"]) do |jpeg|
           MiniMagick::Tool::Convert.new do |convert|
-            convert.density(300)
+            convert.density(200)
             convert << page.path
             convert << jpeg.path
           end
