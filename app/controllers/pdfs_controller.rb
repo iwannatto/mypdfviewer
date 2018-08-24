@@ -101,6 +101,7 @@ class PdfsController < ApplicationController
       return false
     end
     
+    #
     def pdf_to_jpegs
       @pdf.jpegs.purge
       pdf = MiniMagick::Image.open(pdf_params[:pdf].path)
