@@ -2,7 +2,8 @@ require 'mini_magick'
 require 'tempfile'
 
 class PdfsController < ApplicationController
-  before_action :set_pdf, only: [:show, :edit, :update, :destroy]
+  before_action :set_pdf_with_attached_pdf_and_jpegs, only: [:show]
+  before_action :set_pdf, only: [:edit, :update, :destroy]
   
   # GET /pdfs
   # GET /pdfs.json
@@ -77,6 +78,10 @@ class PdfsController < ApplicationController
   end
 
   private
+    def set_pdf_with_attached_pdf_and_jpegs
+      @pdf = Pdf.with_attached_pdf.with_attached_jpegs.find(params[:id])
+    end
+  
     # Use callbacks to share common setup or constraints between actions.
     def set_pdf
       @pdf = Pdf.find(params[:id])
