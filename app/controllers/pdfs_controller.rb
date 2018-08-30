@@ -9,6 +9,7 @@ class PdfsController < ApplicationController
   # GET /pdfs.json
   def index
     @pdfs = Pdf.all.order(last_access: :desc)
+    @turbolinks_no_cache = true
   end
 
   # GET /pdfs/1
