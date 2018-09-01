@@ -6,14 +6,12 @@ class PdfsController < ApplicationController
   before_action :set_pdf, only: [:edit, :update, :destroy]
   
   # GET /pdfs
-  # GET /pdfs.json
   def index
     @pdfs = Pdf.all.order(last_access: :desc)
     @turbolinks_no_cache = true
   end
 
   # GET /pdfs/1
-  # GET /pdfs/1.json
   def show
     @pdf.last_access = Time.now
     @pdf.save
@@ -29,16 +27,12 @@ class PdfsController < ApplicationController
   end
 
   # POST /pdfs
-  # POST /pdfs.json
   def create
     @pdf = Pdf.new
     # active storageはnewした段階で保存されてしまい、
     # モデルバリデーションは後からになってしまうので、ここで検証する。
-    if !create_pdf_validation
-      respond_to do |format|
-        format.html { render :new }
-        format.json { render json: @pdf.errors, status: :unprocessable_entity }
-      end
+    unless create_pdf_validation
+      render :new
       return
     end
     
@@ -47,24 +41,16 @@ class PdfsController < ApplicationController
     @pdf.last_access = Time.zone.now
     pdf_to_jpegs
     @pdf.save
-    respond_to do |format|
-      format.html { redirect_to @pdf, notice: 'Pdf was successfully created.' }
-      format.json { render :show, status: :created, location: @pdf }
-    end
+    redirect_to @pdf, notice: (t '.notice')
   end
 
   # PATCH/PUT /pdfs/1
-  # PATCH/PUT /pdfs/1.json
   def update
     pdf_to_jpegs if pdf_params[:pdf]
-    respond_to do |format|
-      if @pdf.update(pdf_params)
-        format.html { redirect_to @pdf, notice: 'Pdf was successfully updated.' }
-        format.json { render :show, status: :ok, location: @pdf }
-      else
-        format.html { render :edit }
-        format.json { render json: @pdf.errors, status: :unprocessable_entity }
-      end
+    if @pdf.update(pdf_params)
+      redirect_to @pdf, notice: (t '.notice')
+    else
+      render :edit
     end
   end
 
@@ -72,10 +58,7 @@ class PdfsController < ApplicationController
   # DELETE /pdfs/1.json
   def destroy
     @pdf.destroy
-    respond_to do |format|
-      format.html { redirect_to pdfs_url, notice: 'Pdf was successfully destroyed.' }
-      format.json { head :no_content }
-    end
+    redirect_to pdfs_url, notice: (t '.notice')
   end
 
   private
@@ -96,11 +79,11 @@ class PdfsController < ApplicationController
     def create_pdf_validation
       pdf = pdf_params[:pdf]
       if pdf.nil?
-        @pdf.errors.add(:pdf, ' : file is required')
+        @pdf.errors.add(:pdf, (t 'pdfs.create_pdf_validation.required'))
       elsif !pdf.original_filename.include?('.pdf')
-        @pdf.errors.add(:pdf, ' : file should be pdf')
+        @pdf.errors.add(:pdf, (t 'pdfs.create_pdf_validation.pdf'))
       elsif pdf.size > 1.gigabytes
-        @pdf.errors.add(:pdf, ' : file should be less than 1GB')
+        @pdf.errors.add(:pdf, (t 'pdfs.create_pdf_validation.size'))
       else
         return true
       end

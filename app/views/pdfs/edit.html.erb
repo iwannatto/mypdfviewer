@@ -1,6 +1,6 @@
-<h1>Editing Pdf</h1>
+<h1><%= t '.edit' %></h1>
 
 <%= render 'form', pdf: @pdf %>
 
-<%= link_to 'Show', @pdf %> |
-<%= link_to 'Back', pdfs_path %>
+<%= link_to (t '.show'), @pdf %> |
+<%= link_to (t '.back'), pdfs_path %>

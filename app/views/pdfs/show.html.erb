@@ -1,26 +1,26 @@
 <p id="notice"><%= notice %></p>
 
 <p>
-  <strong>Name:</strong>
+  <strong><%= t '.name' %></strong>
   <%= @pdf.name %>
 </p>
 
 <p>
-  <strong>Last access:</strong>
+  <strong><%= t '.last_access' %></strong>
   <%= @pdf.last_access %>
 </p>
 
 <p>
-  <strong>Pdf:</strong>
+  <strong><%= t '.pdf' %></strong>
   <%= link_to url_for(@pdf.pdf), url_for(@pdf.pdf) %>
 </p>
 
 <p>
-  <strong>Jpegs:</strong>
+  <strong><%= t '.jpegs' %></strong>
   <% @pdf.jpegs.attachments.each do |jpeg| %>
     <%= image_tag url_for(jpeg), width: 600 %>
   <% end %>
 </p>
 
-<%= link_to 'Edit', edit_pdf_path(@pdf) %> |
-<%= link_to 'Back', pdfs_path %>
+<%= link_to (t '.edit'), edit_pdf_path(@pdf) %> |
+<%= link_to (t '.back'), pdfs_path %>
