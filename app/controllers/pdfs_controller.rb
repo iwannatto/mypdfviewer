@@ -57,6 +57,8 @@ class PdfsController < ApplicationController
   # DELETE /pdfs/1
   # DELETE /pdfs/1.json
   def destroy
+    @pdf.pdf.purge
+    @pdf.jpegs.purge
     @pdf.destroy
     redirect_to pdfs_url, notice: (t '.notice')
   end
