@@ -7,7 +7,8 @@ en:
     create_pdf_validation:
       required: " : file is required"
       pdf: " : file should be pdf"
-      size: " : file should be less than 1GB"
+      size: " : file should be less than %{n}MB"
+      totalsize: " : total should be less than %{n}MB in the app"
     form:
       error: "%{error} prohibited this pdf from being saved:"
     index:

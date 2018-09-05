@@ -9,7 +9,8 @@ ja:
     create_pdf_validation:
       required: " : ファイルは必須です。"
       pdf: " : pdfファイル以外は追加できません。"
-      size: " : 1GB以上のファイルは追加できません。"
+      size: " : %{n}MB以上のファイルは追加できません。"
+      totalsize: " : アプリ全体で%{n}MBまでしか使えません。"
     index:
       pdf: "pdf一覧"
       name: "ファイル名"

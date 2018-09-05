@@ -39,6 +39,7 @@ class PdfsController < ApplicationController
     @pdf.attributes = pdf_params
     @pdf.name = pdf_params[:pdf].original_filename if pdf_params[:name] = ""
     @pdf.last_access = Time.zone.now
+    @pdf.pdf_and_jpegs_filesize = pdf_params[:pdf].size
     pdf_to_jpegs
     @pdf.save
     redirect_to @pdf, notice: (t '.notice')
@@ -84,18 +85,21 @@ class PdfsController < ApplicationController
         @pdf.errors.add(:pdf, (t 'pdfs.create_pdf_validation.required'))
       elsif !pdf.original_filename.include?('.pdf')
         @pdf.errors.add(:pdf, (t 'pdfs.create_pdf_validation.pdf'))
-      elsif pdf.size > 1.gigabytes
-        @pdf.errors.add(:pdf, (t 'pdfs.create_pdf_validation.size'))
+      elsif pdf.size > 1.megabytes
+        @pdf.errors.add(:pdf, (t 'pdfs.create_pdf_validation.size', n: 1))
+      elsif Pdf.sum(:pdf_and_jpegs_filesize) > 10.megabytes
+        @pdf.errors.add(:pdf, (t 'pdfs.create_pdf_validation.totalsize', n: 10))
       else
         return true
       end
       return false
     end
     
-    #
+    # pdf→jpeg変換の本体
     def pdf_to_jpegs
       @pdf.jpegs.purge
       pdf = MiniMagick::Image.open(pdf_params[:pdf].path)
+      jpegs_filesize = 0
       pdf.layers.each_with_index do |page, idx|
         Tempfile.create(["", ".jpeg"]) do |jpeg|
           MiniMagick::Tool::Convert.new do |convert|
@@ -105,7 +109,9 @@ class PdfsController < ApplicationController
           end
           @pdf.jpegs.attach(io: jpeg,
             filename: "#{idx}.jpeg", content_type: 'image/jpeg')
+          jpegs_filesize += jpeg.size
         end
       end
+      @pdf.pdf_and_jpegs_filesize += jpegs_filesize
     end
 end
