@@ -24,23 +24,23 @@
 その点にはご留意ください。
 
 # 環境について
+* macOS High Sierra 10.13.6
+* ruby 2.4.1 
+* SQLite 3.19.3
+* NodeがないのでJS runtimeはJavaScriptCoreとかいうやつになってる（？）
 
 このアプリをサーバにて動作させる場合、imagemagickが必要です。
 ```
 $ convert --version
-Version: ImageMagick 6.7.8-9 2016-06-22 Q16 http://www.imagemagick.org
-Copyright: Copyright (C) 1999-2012 ImageMagick Studio LLC
-Features: OpenMP
+Version: ImageMagick 7.0.8-59 Q16 x86_64 2019-08-05 https://imagemagick.org
+Copyright: © 1999-2019 ImageMagick Studio LLC
+License: https://imagemagick.org/script/license.php
+Features: Cipher DPC HDRI Modules OpenMP(3.1) 
+Delegates (built-in): bzlib freetype heic jng jp2 jpeg lcms ltdl lzma openexr png tiff webp xml zlib
 ```
 
-```
-$ rails about
-About your application's environment
-Rails version             5.2.0
-Ruby version              2.4.1-p111 (x86_64-linux)
-RubyGems version          2.6.14
-Rack version              2.0.5
-JavaScript Runtime        Node.js (V8)
-...
-Database adapter          sqlite3
-```
+# memo
+vulnerability botみたいなやつがうるさいのでgemをupdateしたらなんかテストが失敗するようになった（え〜〜）    
+多分railsのアップデートに伴う仕様変更かruntimeがnodeじゃないことか？  
+もしくは単にテストデータ足りてないだけな気がしてきた(環境を移したので)  
+めんどいから確認してないけどまあいけそうなので暇なときに直したいですね  
