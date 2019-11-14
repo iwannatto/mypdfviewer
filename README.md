@@ -23,13 +23,16 @@
 ただし、アップロードされたファイルは公開される上に勝手に消滅するので、  
 その点にはご留意ください。
 
-# 環境について
+# 開発環境
 * macOS High Sierra 10.13.6
 * ruby 2.4.1 
 * SQLite 3.19.3
 * NodeがないのでJS runtimeはJavaScriptCoreとかいうやつになってる（？）
 
-このアプリをサーバにて動作させる場合、imagemagickが必要です。
+# デプロイ
+herokuにデプロイするのを想定しています  
+
+imagemagickが必要です  
 ```
 $ convert --version
 Version: ImageMagick 7.0.8-59 Q16 x86_64 2019-08-05 https://imagemagick.org
@@ -40,7 +43,3 @@ Delegates (built-in): bzlib freetype heic jng jp2 jpeg lcms ltdl lzma openexr pn
 ```
 
 # memo
-vulnerability botみたいなやつがうるさいのでgemをupdateしたらなんかテストが失敗するようになった（え〜〜）    
-多分railsのアップデートに伴う仕様変更かruntimeがnodeじゃないことか？  
-もしくは単にテストデータ足りてないだけな気がしてきた(環境を移したので)  
-めんどいから確認してないけどまあいけそうなので暇なときに直したいですね  

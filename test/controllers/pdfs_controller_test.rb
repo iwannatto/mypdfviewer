@@ -16,14 +16,17 @@ class PdfsControllerTest < ActionDispatch::IntegrationTest
   end
 
   test "should create pdf" do
+    fixture_file_path = File.expand_path('./test/fixtures/files/resume.pdf', Rails.root)
     assert_difference('Pdf.count') do
-      post pdfs_url, params: { pdf: { last_access: @pdf.last_access, name: @pdf.name } }
+      post pdfs_url, params: { pdf: { last_access: @pdf.last_access, name: @pdf.name, pdf: fixture_file_upload(fixture_file_path) } }
     end
 
     assert_redirected_to pdf_url(Pdf.last)
   end
 
   test "should show pdf" do
+    fixture_file_path = File.expand_path('./test/fixtures/files/resume.pdf', Rails.root)
+    @pdf.pdf.attach(io: File.open(fixture_file_path), filename: 'resume.pdf', content_type: 'application/pdf')
     get pdf_url(@pdf)
     assert_response :success
   end
